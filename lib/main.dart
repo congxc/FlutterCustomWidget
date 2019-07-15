@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'page/clear_text_field_demo.dart';
 import 'page/swipe_menu_list_demo.dart';
 
 void main() {
@@ -62,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: ListView(
           children: <Widget>[
             buildItem(context, "侧滑删除","SwipeMenuList",SwipeMenuListDemo()),
+            buildItem(context, "带输出图标的TextFiled","ClearTextFiled",ClearTextFiledDemo()),
           ],
         ));
   }
