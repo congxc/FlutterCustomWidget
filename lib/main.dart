@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'page/clear_text_field_demo.dart';
 import 'page/swipe_menu_list_demo.dart';
+import 'page/dialog_demo.dart';
 
 void main() {
   runApp(MyApp());
@@ -64,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             buildItem(context, "侧滑删除","SwipeMenuList",SwipeMenuListDemo()),
             buildItem(context, "带输出图标的TextFiled","ClearTextFiled",ClearTextFiledDemo()),
+            buildItem(context, "弹出指定位置Dialog","PositionedDialog",DialogDemo()),
           ],
         ));
   }

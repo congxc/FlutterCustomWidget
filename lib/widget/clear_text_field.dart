@@ -4,9 +4,11 @@ import 'package:flutter/services.dart';
 class ClearTextField extends StatefulWidget {
   final TextEditingController controller;
   final double width;
+  final Color brackGround;
   final double height;
   final String hintText;
-  final String hintTextStyle;
+  final TextStyle hintTextStyle;
+  final Padding padding;
   final FocusNode focusNode;
   final TextInputType keyboardType;
   final TextStyle style;
@@ -30,6 +32,7 @@ class ClearTextField extends StatefulWidget {
   final GestureTapCallback onTap;
   final GestureTapCallback onTapClearIcon;
   final Decoration decoration;
+  final bool supportClear;
 
   @override
   _ClearTextFieldState createState() => _ClearTextFieldState();
@@ -39,9 +42,12 @@ class ClearTextField extends StatefulWidget {
       this.controller,
       this.width = double.infinity,
       this.height = double.infinity,
+      this.supportClear = true,
+      this.padding,
       this.style,
       this.hintText,
       this.hintTextStyle,
+      this.brackGround,
       this.decoration,
       this.focusNode,
       this.keyboardType,
@@ -73,6 +79,9 @@ class _ClearTextFieldState extends State<ClearTextField> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    if (!widget.supportClear) {
+      return;
+    }
     focusNode = FocusNode()
       ..addListener(() {
         if (widget.controller != null) {
@@ -84,7 +93,12 @@ class _ClearTextFieldState extends State<ClearTextField> {
       });
     widget.controller?.addListener(() {
       setState(() {
-        visible = focusNode.hasFocus && widget.controller.value.text.isNotEmpty;
+        if (widget.enabled) {
+          visible =
+              focusNode.hasFocus && widget.controller.value.text.isNotEmpty;
+        } else {
+          visible = widget.controller.value.text.isNotEmpty;
+        }
       });
     });
   }
@@ -92,10 +106,12 @@ class _ClearTextFieldState extends State<ClearTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: widget.padding ?? EdgeInsets.all(0),
       decoration: widget.decoration ??
           BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(4.0)),
+              color: widget.brackGround ?? Colors.white,
+              border: Border.all(color: Colors.black45),
+              borderRadius: BorderRadius.circular(10.0)),
       constraints: BoxConstraints(
         maxWidth: widget.width,
         maxHeight: widget.height,
@@ -104,7 +120,8 @@ class _ClearTextFieldState extends State<ClearTextField> {
         //cursorColor: Colors.red,
         focusNode: focusNode,
         controller: widget.controller,
-        style: widget.style ?? TextStyle(color: Colors.black87, fontSize: 14),
+        style: widget.style ??
+            TextStyle(color: Color(0xFF464646), fontSize: 18),
         strutStyle: widget.strutStyle,
         textAlign: widget.textAlign,
         textAlignVertical: widget.textAlignVertical,
@@ -117,17 +134,28 @@ class _ClearTextFieldState extends State<ClearTextField> {
         onEditingComplete: widget.onEditingComplete,
         onSubmitted: widget.onSubmitted,
         inputFormatters: widget.inputFormatters,
-        enabled: widget.enabled,
-        onTap: widget.onTap,
+//        enabled: widget.enabled,//此处无法响应点击事件
+        enableInteractiveSelection: widget.enabled, //
+        onTap: () {
+          print("--------------onTap");
+          if(!widget.enabled){
+            FocusScope.of(context).requestFocus(FocusNode());//抢掉焦点 防止编辑
+          }
+          widget.onTap?.call();
+        },
         maxLines: 1,
         decoration: InputDecoration(
             border: InputBorder.none,
             hintText: widget.hintText,
             contentPadding: EdgeInsets.all(4),
             hintStyle: widget.hintTextStyle ??
-                TextStyle(color: Colors.grey, fontSize: 14),
-            prefixIcon:
-                widget.prefixIcon == null ? null : Icon(widget.prefixIcon),
+                TextStyle(color: Color(0xFFD0D0D0), fontSize: 18),
+            prefixIcon: widget.prefixIcon == null
+                ? null
+                : Icon(
+                    widget.prefixIcon,
+                    color: Color(0xFF464646),
+                  ),
             suffixIcon: Visibility(
               visible: visible,
               child: InkWell(
@@ -137,7 +165,7 @@ class _ClearTextFieldState extends State<ClearTextField> {
                 },
                 child: Icon(
                   Icons.clear,
-                  color: Colors.red,
+                  color: Colors.grey[400],
                 ),
               ),
             )),
